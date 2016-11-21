@@ -62,27 +62,21 @@ class DataBCB
 	# The Webservice will always supply the date in three separate fields,
 	# this methods aim to convert it to a standard dd.mm.YYYY string.
 	def standardizes_date(day, month, year)
-		return "#{standardizes_number(day.to_i)}." 
-		     + "#{standardizes_number(mmonth.to_i)}." 
-		     + "#{year}"
+		return "#{standardizes_number(day.to_i)}.#{standardizes_number(month.to_i)}.#{year}"
 	end
 
 	# As we are building a dd.mm.yyyy string, we want to 
 	# standardize the size of the fields.
 	def standardizes_number(number)
 		if (number < 10)
-			return "0" + number.to_s
+			return "0#{number}"
 		else
-			return number.to_s
+			return "#{number}"
 		end
 	end
 	
 	def print()
-		return "Name: #{@name}\n" 
-		     + "BCB Code: #{@pk}\n" 
-		     + "Periodicity: #{@periodicity}\n" 
-		     + "Unit: #{@unit}\n" 
-		     + "Date: #{@date}   Value: #{@value}\n"
+		return "Name: #{@name}\nBCB Code: #{@pk}\nPeriodicity: #{@periodicity}\nUnit: #{@unit}\nDate: #{@date}   Value: #{@value}\n"
 	end
 
 	# Simple comparission between two DataBCB objects.
