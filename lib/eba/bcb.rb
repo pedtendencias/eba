@@ -2,8 +2,8 @@ require "savon"
 require "net/https"
 require "nokogiri"
 require "date"
-require "./encoder"
-require "./data"
+require "/eba/encoder"
+require "/eba/data"
 
 class BCB < Encoder
 
@@ -54,7 +54,7 @@ class BCB < Encoder
 		# MES = MONTH
 		# ANO = YEAR
 		# VALOR = VALUE
-		return DadoBCB.new(encode(xmlResult.search("NOME").text), 
+		return DataBCB.new(encode(xmlResult.search("NOME").text), 
 				   series_code, 
 				   encode(xmlResult.search("PERIODICIDADE").text), 
 				   encode(xmlResult.search("UNIDADE").text), 
@@ -88,7 +88,7 @@ class BCB < Encoder
 				results[code] = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
 										   [:get_valores_series_xml_return])
 			rescue	
-				puts "Failure trying to update " + code
+				puts "Failure trying to extract " + code
 			end
 
 			codes.clear	
@@ -116,6 +116,6 @@ class BCB < Encoder
 			end
 		end
 
-		return dados
+		return data_collection 
 	end
 end
