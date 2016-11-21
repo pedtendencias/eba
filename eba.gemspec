@@ -10,10 +10,13 @@ Gem::Specification.new do |spec|
   spec.email         = ["rcampos@tendencias.com.br"]
 
   spec.summary       = %q{Class which serves as interface with Brazillian Central Bank databases through the Webservice SGS - Sistema Gerenciador de Séries Temporais - v2.1. eba stands for Easy BCB Access and is also an expression of joy in Brazillian Portuguese.}
-  spec.description   = %q{This class was developed in a partinership with Tendencias - Consultoria Econômica, a economical analysis company from Brazil. The intent is, given that you know one of more primary keys for series inside the BCB database, you can extract updates or the full historical data of said series.}
+  spec.description   = %q{This class was developed in a partinership with Tendencias - Consultoria Econômica, a economical analysis company from Brazil. The intent is, given that you know one or more primary keys for series inside the BCB database, you can extract updates or the full historical data of said series.\nEba stands for Easy BCB Access and is also an expression of joy in Brazillian Portuguese.}
   spec.homepage      = "https://github.com/rCamposCruz/eba"
   spec.license       = "MIT"
+<<<<<<< HEAD
 
+=======
+>>>>>>> development
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
