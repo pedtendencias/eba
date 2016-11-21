@@ -88,7 +88,7 @@ class BCB < Encoder
 				results[code] = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
 										   [:get_valores_series_xml_return])
 			rescue	
-				puts "Failure trying to extract " + code
+				puts "Failure trying to extract #{code}"
 			end
 
 			codes.clear	
