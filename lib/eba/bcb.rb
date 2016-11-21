@@ -26,7 +26,7 @@ class BCB < Encoder
 	################################################################################################
 
 	def initialize(path_to_certificate)
-		@pub_key = path_to_certificates
+		@pub_key = path_to_certificate
 		connect_to_service()
 	end
 
