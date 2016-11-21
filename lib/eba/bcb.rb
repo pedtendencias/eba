@@ -2,8 +2,8 @@ require "savon"
 require "net/https"
 require "nokogiri"
 require "date"
-require "./encoder"
-require "./data"
+require_relative "encoder"
+require_relative "data"
 
 class BCB < Encoder
 
