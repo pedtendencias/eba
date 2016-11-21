@@ -42,7 +42,7 @@ class BCB < Encoder
 	end
 
 	def get_last_value(series_code)
-		response = @service.call(:get_ultimo_valor_xml, message: {in0: cod_serie.to_s})
+		response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
 		xmlResult = Nokogiri::XML(response.to_hash[:get_ultimo_valor_xml_response][:get_ultimo_valor_xml_return], nil, 'UTF-8')
 
 		# As it's a brazillian database it's column identifications are in portuguese,
@@ -73,7 +73,7 @@ class BCB < Encoder
 			codes << code.to_s
 
 			# Build the  message from the start of the historical series
-			message = { in0: {long: codigos}, 
+			message = { in0: {long: codes}, 
 				    in1: '01/02/2004', 
 				    in2: Time.now.strftime('%d/%m/%Y').to_s}
 			
