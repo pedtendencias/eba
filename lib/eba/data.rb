@@ -18,11 +18,11 @@ class DataBCB
 		@pk = series_code
 		@periodicity = series_periodicity
 		@unit = series_unit
-		@data = standardizes_date(series_day, series_month, series_year)
+		@date = standardizes_date(series_day, series_month, series_year)
 
 		# Removes the . which separate every three numbers.
 		# This might be supperfluous, haven't tested it though.
-		@valor = valor.tr(".", "").to_f
+		@value = series_value.tr(".", "").to_f
 	end	
 	
 	# Return an "identification key" with data which should 
