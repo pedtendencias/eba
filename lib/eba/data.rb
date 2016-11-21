@@ -79,10 +79,10 @@ class DataBCB
 	
 	def print()
 		return "Name: #{@name}\n" 
-		     + "BCB Code: #{pk}\n" 
-		     + "Periodicity: #{periodicity}\n" 
-		     + "Unit: #{unit}\n" 
-		     + "Date: #{date}   Value: #{value}\n"
+		     + "BCB Code: #{@pk}\n" 
+		     + "Periodicity: #{@periodicity}\n" 
+		     + "Unit: #{@unit}\n" 
+		     + "Date: #{@date}   Value: #{@value}\n"
 	end
 
 	# Simple comparission between two DataBCB objects.
