@@ -105,7 +105,7 @@ class BCB < Encoder
 			# portuguese uses a huge ammount of special characters and
 			# accentuations.
 			result.css("ITEM").each do |item|
-				data_collection << DadoBCB.new(encode(base_data.name), 
+				data_collection << DataBCB.new(encode(base_data.name), 
 				   		     	       code, 
 	 	  				   	       base_data.periodicity, 
 	   					   	       encode(base_data.unit), 
