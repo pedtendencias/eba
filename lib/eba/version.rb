@@ -1,0 +1,3 @@
+module Eba
+  VERSION = "0.1.0"
+end
