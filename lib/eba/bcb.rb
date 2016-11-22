@@ -38,11 +38,15 @@ class BCB < Encoder
 	# List of all operations available for the webservice,
 	# useful for expanding the gem
 	def list_operations()
-		puts @service.operations
+		return @service.operations
 	end
 
 	def get_last_value(series_code)
-		response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
+		begin
+			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
+		rescue
+			return nil
+		end
 		xmlResult = Nokogiri::XML(response.to_hash[:get_ultimo_valor_xml_response][:get_ultimo_valor_xml_return], nil, 'UTF-8')
 
 		# As it's a brazillian database it's column identifications are in portuguese,
@@ -88,6 +92,7 @@ class BCB < Encoder
 				results[code] = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
 										   [:get_valores_series_xml_return])
 			rescue	
+				results[code] = nil
 				puts "Failure trying to extract #{code}"
 			end
 
@@ -100,20 +105,21 @@ class BCB < Encoder
 			# as series name, periodicity, etc. 
 			base_data = get_last_value(code)				
 	
-
-			# Encode enforces data data is being read as UTF-8, as 
-			# portuguese uses a huge ammount of special characters and
-			# accentuations.
-			result.css("ITEM").each do |item|
-				data_collection << DataBCB.new(encode(base_data.name), 
-				   		     	       code, 
-	 	  				   	       base_data.periodicity, 
-	   					   	       encode(base_data.unit), 
-					             	       "1", 
-					       		       item.css("DATA").text.split("/")[0], 
-					  	       	       item.css("DATA").text.split("/")[1], 
-				   		    	       item.css("VALOR").text)
+			if result != nil then
+			  # Encode enforces data data is being read as UTF-8, as 
+			  # portuguese uses a huge ammount of special characters and
+			  # accentuations.
+			  result.css("ITEM").each do |item|
+				  data_collection << DataBCB.new(encode(base_data.name), 
+				   		     	         code, 
+	 	  				   	         base_data.periodicity, 
+	   					   	         encode(base_data.unit), 
+					             	         "1", 
+					       		         item.css("DATA").text.split("/")[0], 
+					  	       	         item.css("DATA").text.split("/")[1], 
+				   		    	         item.css("VALOR").text)
 			end
+		       end
 		end
 
 		return data_collection 

@@ -1,11 +1,102 @@
 require "spec_helper"
+require 'date'
 
 describe Eba do
   it "has a version number" do
     expect(Eba::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  context "when you receive a certificate" do
+    before :all do
+      @eba = BCB.new('/valid_certificate/pubkey.pem')
+    end
+
+    it "it has a list of operations" do
+      operations = @eba.list_operations
+      expect(operations != nil).to eq(true)
+    end
+
+    context "and requests the last value for an series" do
+      # As of 2016-11-22 98526 was an invalid series.
+      before :all do
+	@valid_series = 20753
+        @invalid_series = 98526 
+      end
+      
+      context "but the requested sereis is invalid" do
+	before :all do
+	  @data_object = @eba.get_last_value(@invalid_series)
+	end
+
+        it "is nil" do
+	  expect(@data_object == nil).to eq(true)
+        end
+      end
+
+      context "and the requested series is a valid one" do 
+	before :all do
+	  @data_object = @eba.get_last_value(@valid_series)
+	end
+	
+	it "is not nil" do
+          expect(@data_object != nil).to eq(true)
+        end
+
+        it "has a non nil name" do
+	  expect(@data_object.name != nil).to eq(true)
+        end
+
+	it "has a numeric pk greater than 0" do
+	  test = @data_object.pk.to_i > 0 rescue false
+	  expect(test).to eq(true)
+	end
+
+	it "has a valid float value" do
+	  test = @data_object.value.to_f != nil rescue false
+	  expect(test).to eq(true)
+	end
+
+	it "has a periodicity composed of a single character" do
+	  expect(@data_object.periodicity.length).to eq(1)
+	end
+
+	it "has a non nil unit" do
+	  expect(@data_object.unit != nil).to eq(true)
+	end
+
+	it "has a valid date" do
+	  test = DateTime.parse(@data_object.date).to_date != nil rescue false
+     	  expect(test).to eq(true)
+	end
+      end
+    end
+
+    context "requests data for two series" do
+      before :all do
+        @valid_series1 = 20753
+        @valid_series2 = 20800
+        @invalid_series = 98526 
+      end
+
+      context "using two valid series" do
+        before :all do
+          @data_result = @eba.get_all_data_for_array([@valid_series1, @valid_series2])
+        end
+
+        it "has no nils" do
+          expect(@data_result.include? nil).to eq(false)
+        end
+      end
+
+      context "one of the requested series is invalid" do
+        before :all do
+          @data_result = @eba.get_all_data_for_array([@valid_series1, @invalid_series])
+        end
+
+        it "has no nils" do
+          expect(@data_result.include? nil).to eq(false)
+        end
+      end
+    end
   end
 end
