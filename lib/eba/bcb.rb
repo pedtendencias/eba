@@ -68,7 +68,8 @@ class BCB < Encoder
 				   encode(xmlResult.search("VALOR").text)) 
 	end
 
-	def get_all_data_for_array(array_of_codes)
+	# Ensure that date is in the format dd/MM/YYY
+	def get_all_data_for_array(array_of_codes, date)
 		results = {}
 		codes = Array.new()
 		data_collection = Array.new()
@@ -78,7 +79,7 @@ class BCB < Encoder
 
 			# Build the  message from the start of the historical series
 			message = { in0: {long: codes}, 
-				    in1: '01/02/2004', 
+				    in1: date, 
 				    in2: Time.now.strftime('%d/%m/%Y').to_s}
 			
 			# try and catch, as some series can be discontinued or a code may be broken
