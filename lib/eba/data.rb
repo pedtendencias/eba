@@ -1,7 +1,7 @@
 # This class intends to organize the series data in a easy to use way,
 # making it easier to group lots of data in a coese way, without lost of
 # information.
-class DataBCB
+class Data_bcb
 	@name = ""
 	@periodicity = 0
 	@unit = ""
@@ -19,10 +19,7 @@ class DataBCB
 		@periodicity = series_periodicity
 		@unit = series_unit
 		@date = standardizes_date(series_day, series_month, series_year)
-
-		# Removes the . which separate every three numbers.
-		# This might be supperfluous, haven't tested it though.
-		@value = series_value.tr(".", "").to_f
+		@value = series_value.to_f
 	end	
 	
 	# Return an "identification key" with data which should 
