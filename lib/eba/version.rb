@@ -6,7 +6,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.0.1.333"
+  VERSION = "1.0.1.3"
 
   #Version 1.0.0.1
   #
