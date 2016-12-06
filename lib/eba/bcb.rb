@@ -58,7 +58,7 @@ class BCB < Encoder
 		# MES = MONTH
 		# ANO = YEAR
 		# VALOR = VALUE
-		return DataBCB.new(encode(xmlResult.search("NOME").text), 
+		return Data_bcb.new(encode(xmlResult.search("NOME").text), 
 				   series_code, 
 				   encode(xmlResult.search("PERIODICIDADE").text), 
 				   encode(xmlResult.search("UNIDADE").text), 
@@ -86,7 +86,7 @@ class BCB < Encoder
 			begin
 				# This request has a limit of series he can get at a time, thus
 				# it's way simpler to break a composite requests in various smaller
-				# requests. The DataBCB class serves as a way to organize such data
+				# requests. The Data_bcb class serves as a way to organize such data
 				# and allow the developer to easily identify which series each data
 				# object pertains.
 				response = @service.call(:get_valores_series_xml, message: message)
@@ -111,7 +111,7 @@ class BCB < Encoder
 			  # portuguese uses a huge ammount of special characters and
 			  # accentuations.
 			  result.css("ITEM").each do |item|
-				  data_collection << DataBCB.new(encode(base_data.name), 
+				  data_collection << Data_bcb.new(encode(base_data.name), 
 				   		     	         code, 
 	 	  				   	         base_data.periodicity, 
 	   					   	         encode(base_data.unit), 
