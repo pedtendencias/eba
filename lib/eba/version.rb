@@ -21,7 +21,11 @@ module Eba
   # spec/valid_certificate contains a certificate which is valid at this moment (2016-11-22)
 
   #Version 1.0.1.2
-  # Now get_all_data_for_array also expects a valid date in the format dd/MM/YYYY
+  # Now get_all_data_for_array also expects a valid date in the format dd/MM/YYYY.
 
 
+  #Version 1.0.1.3
+  # Removed the removal of '.' character from value, it was actually losing data.
+  # Changed DataBCB class name to Data_bcb, to keep with the standard snake case.
+  # updated spec tests accordingly.  
 end
