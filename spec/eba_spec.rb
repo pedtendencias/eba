@@ -76,11 +76,12 @@ describe Eba do
         @valid_series1 = 20753
         @valid_series2 = 20800
         @invalid_series = 98526 
+	@starting_date = "01/01/1900"
       end
 
       context "using two valid series" do
         before :all do
-          @data_result = @eba.get_all_data_for_array([@valid_series1, @valid_series2])
+          @data_result = @eba.get_all_data_for_array([@valid_series1, @valid_series2], @starting_date)
         end
 
         it "has no nils" do
@@ -90,7 +91,7 @@ describe Eba do
 
       context "one of the requested series is invalid" do
         before :all do
-          @data_result = @eba.get_all_data_for_array([@valid_series1, @invalid_series])
+          @data_result = @eba.get_all_data_for_array([@valid_series1, @invalid_series], @starting_date)
         end
 
         it "has no nils" do
