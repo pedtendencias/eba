@@ -6,7 +6,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.0.1.3"
+  VERSION = "1.0.2.3"
 
   #Version 1.0.0.1
   #
@@ -28,4 +28,7 @@ module Eba
   # Removed the removal of '.' character from value, it was actually losing data.
   # Changed DataBCB class name to Data_bcb, to keep with the standard snake case.
   # updated spec tests accordingly.  
+
+  #Version 1.0.2.3
+  # Added HTTP compression to Savon requests.
 end
