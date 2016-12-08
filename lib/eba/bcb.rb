@@ -31,8 +31,11 @@ class BCB < Encoder
 	end
 
 	def connect_to_service()
-		@service = Savon.client(wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl", 
-					ssl_cert_file: @pub_key)
+
+
+		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl",
+					ssl_cert_file: @pub_key,
+					headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
 
 	# List of all operations available for the webservice,
