@@ -63,14 +63,14 @@ class BCB < Encoder
 		purged_array_of_codes = purge_invalid_series(array_of_codes)
 		result = {}
 
-		array_of_codes.each do |code|
+		purged_array_of_codes.each do |code|
 			dado = get_last_value(code)
 	
 			if not result.key? dado.periodicity then
 				result[dado.periodicity] = []
 			end
 
-			result[dado.periodicity] << code
+			result[dado.periodicity] << dado
 		end
 
 		return result
@@ -106,7 +106,6 @@ class BCB < Encoder
 	# Ensure that date is in the format dd/MM/YYY
 	def get_all_data_for_array(array_of_codes, date)
 		result = nil
-		codes = Array.new()
 		data_collection = Array.new()
 
 		# This request has a limit of series he can get at a time, thus
@@ -115,46 +114,56 @@ class BCB < Encoder
 		# and allow the developer to easily identify which series each data
 		# object pertains.		
 		array_of_codes.each_slice(50).to_a.each do |array|
-			array = purge_invalid_series(array)
+			hash = hash_by_periodicity(array)
 
-			# Build the  message from the start of the historical series
-			message = { in0: {long: array}, 
-				    in1: date, 
-				    in2: Time.now.strftime('%d/%m/%Y').to_s}
+			hash.each do |periodicity, array|
+				codes = []
+				data_array = []
 
-			# try and catch, as some series can be discontinued or a code may be broken
-			begin
-				response = @service.call(:get_valores_series_xml, message: message)
-				result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
-										   [:get_valores_series_xml_return])
-
-			rescue Exception => erro
-				puts "Error requesting! #{erro}"
-			end
-
-			i = 0
-
-			result.css("SERIE").each do |serie|
-				# recover identifying data from the getLastValue method,
-				# as the get_valores_series_xml desn't have identifying data
-				# as series name, periodicity, etc. 
-				base_data = get_last_value(array[i])
-				comp = 'name="ID" value="' + array[i].to_s + '"'
- 
-				if serie.inspect.include? comp
-					serie.css("ITEM").each do |item|
-						data_collection << Data_bcb.new(encode(base_data.name), 
-					   			     	        array[i], 
-		 		  				   	        base_data.periodicity, 
-	   						   	                encode(base_data.unit), 
-						             	                "1", 
-					       			                item.css("DATA").text.split("/")[0], 
-					  	       		         	item.css("DATA").text.split("/")[1], 
-				   		    	        	 	item.css("VALOR").text)
-					end
+				array.each do |data|
+					data_array <<  data	
+					codes << data.pk
 				end
 
-				i = i + 1
+				# Build the  message from the start of the historical series
+				message = { in0: {long: codes}, 
+					    in1: date, 
+					    in2: Time.now.strftime('%d/%m/%Y').to_s}
+
+				# try and catch, as some series can be discontinued or a code may be broken
+				begin
+					response = @service.call(:get_valores_series_xml, message: message)
+					result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
+			   						       [:get_valores_series_xml_return])
+
+				rescue Exception => erro
+					puts "Error requesting! #{erro}"
+				end
+
+				i = 0
+
+				result.css("SERIE").each do |serie|
+					# recover identifying data from the getLastValue method,
+					# as the get_valores_series_xml desn't have identifying data
+					# as series name, periodicity, etc. 
+					base_data = data_array[i]
+					comp = 'name="ID" value="' + codes[i].to_s + '"'
+ 
+					if serie.inspect.include? comp
+						serie.css("ITEM").each do |item|
+							data_collection << Data_bcb.new(encode(base_data.name), 
+						   			     	        array[i], 
+		 			  				   	        base_data.periodicity, 
+	   							   	                encode(base_data.unit), 
+						        	     	                "1", 
+					       			        	        item.css("DATA").text.split("/")[0], 
+					  	       			         	item.css("DATA").text.split("/")[1], 
+				   		    	        	 		item.css("VALOR").text)
+						end
+					end
+
+					i = i + 1
+				end
 			end
 		end
 
