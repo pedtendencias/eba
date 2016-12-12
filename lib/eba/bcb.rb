@@ -59,6 +59,23 @@ class BCB < Encoder
 		return result 
 	end
 
+	def hash_by_periodicity(array_of_codes)
+		purged_array_of_codes = purge_invalid_series(array_of_codes)
+		result = {}
+
+		array_of_codes.each do |code|
+			dado = get_last_value(code)
+	
+			if not result.key? dado.periodicity then
+				result[dado.periodicity] = []
+			end
+
+			result[dado.periodicity] << code
+		end
+
+		return result
+	end
+
 	def get_last_value(series_code)
 		begin
 			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
