@@ -1,11 +1,11 @@
 module Eba
   # For documentation purposes:
   # VERSION = mm.dd.ff.hh
-  # mm - commits on master
+  # mm - major change
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.3.3"
+  VERSION = "1.4.3"
 
   #Version 1.0.1
   #
@@ -33,4 +33,7 @@ module Eba
 
   #Version 1.3.3
   # get_all_data_for_array extracts data now as bulk, in order to make better use of the compression.
+
+  #Version 1.4.3
+  # get_all_data_for_array now handles different periodicities for any ammount of codes.
 end
