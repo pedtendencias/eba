@@ -23,7 +23,7 @@ describe Eba do
         @invalid_series = 98526 
       end
       
-      context "but the requested sereis is invalid" do
+      context "but the requested series is invalid" do
 	before :all do
 	  @data_object = @eba.get_last_value(@invalid_series)
 	end
@@ -73,15 +73,16 @@ describe Eba do
 
     context "requests data for two series" do
       before :all do
-        @valid_series1 = 20753
-        @valid_series2 = 20800
+        @valid_series1 = 20541
+        @valid_series2 = 20542
         @invalid_series = 98526 
-	@starting_date = "01/01/1900"
+	@starting_date = "01/10/2016"
       end
 
       context "using two valid series" do
         before :all do
-          @data_result = @eba.get_all_data_for_array([@valid_series1, @valid_series2], @starting_date)
+	  array = [@valid_series1, @valid_series2] 
+          @data_result = @eba.get_all_data_for_array(array, @starting_date)
         end
 
         it "has no nils" do

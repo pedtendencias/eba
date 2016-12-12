@@ -34,14 +34,29 @@ class BCB < Encoder
 
 
 		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl",
-					ssl_cert_file: @pub_key,
-					headers: {'Accept-Encoding' => 'gzip, deflate'}})
+					ssl_cert_file: @pub_key})#,
+					#headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
 
 	# List of all operations available for the webservice,
-	# useful for expanding the gem
+	# useful for expanding the gem.
 	def list_operations()
 		return @service.operations
+	end
+
+	# Removes all invalid series from an array.
+	#
+	# An invalid series has last value.
+	def purge_invalid_series(array_of_codes)
+		result = []
+
+		array_of_codes.each do |code|
+			if get_last_value(code) != nil
+				result << code
+			end
+		end
+
+		return result 
 	end
 
 	def get_last_value(series_code)
@@ -73,57 +88,57 @@ class BCB < Encoder
 
 	# Ensure that date is in the format dd/MM/YYY
 	def get_all_data_for_array(array_of_codes, date)
-		results = {}
+		result = nil
 		codes = Array.new()
 		data_collection = Array.new()
 
-		array_of_codes.each do |code|
-			codes << code.to_s
+		# This request has a limit of series he can get at a time, thus
+		# it's way simpler to break a composite requests in various smaller
+		# requests. The Data_bcb class serves as a way to organize such data
+		# and allow the developer to easily identify which series each data
+		# object pertains.		
+		array_of_codes.each_slice(50).to_a.each do |array|
+			array = purge_invalid_series(array)
 
 			# Build the  message from the start of the historical series
-			message = { in0: {long: codes}, 
+			message = { in0: {long: array}, 
 				    in1: date, 
 				    in2: Time.now.strftime('%d/%m/%Y').to_s}
-			
+
 			# try and catch, as some series can be discontinued or a code may be broken
 			begin
-				# This request has a limit of series he can get at a time, thus
-				# it's way simpler to break a composite requests in various smaller
-				# requests. The Data_bcb class serves as a way to organize such data
-				# and allow the developer to easily identify which series each data
-				# object pertains.
 				response = @service.call(:get_valores_series_xml, message: message)
-				results[code] = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
+				result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
 										   [:get_valores_series_xml_return])
-			rescue	
-				results[code] = nil
-				puts "Failure trying to extract #{code}"
+
+			rescue Exception => erro
+				puts "Error requesting! #{erro}"
 			end
 
-			codes.clear	
-		end
+			i = 0
 
-		results.each do |code, result|
-			# recover identifying data from the getLastValue method,
-			# as the get_valores_series_xml desn't have identifying data
-			# as series name, periodicity, etc. 
-			base_data = get_last_value(code)				
-	
-			if result != nil then
-			  # Encode enforces data data is being read as UTF-8, as 
-			  # portuguese uses a huge ammount of special characters and
-			  # accentuations.
-			  result.css("ITEM").each do |item|
-				  data_collection << Data_bcb.new(encode(base_data.name), 
-				   		     	         code, 
-	 	  				   	         base_data.periodicity, 
-	   					   	         encode(base_data.unit), 
-					             	         "1", 
-					       		         item.css("DATA").text.split("/")[0], 
-					  	       	         item.css("DATA").text.split("/")[1], 
-				   		    	         item.css("VALOR").text)
+			result.css("SERIE").each do |serie|
+				# recover identifying data from the getLastValue method,
+				# as the get_valores_series_xml desn't have identifying data
+				# as series name, periodicity, etc. 
+				base_data = get_last_value(array[i])
+				comp = 'name="ID" value="' + array[i].to_s + '"'
+ 
+				if serie.inspect.include? comp
+					serie.css("ITEM").each do |item|
+						data_collection << Data_bcb.new(encode(base_data.name), 
+					   			     	        array[i], 
+		 		  				   	        base_data.periodicity, 
+	   						   	                encode(base_data.unit), 
+						             	                "1", 
+					       			                item.css("DATA").text.split("/")[0], 
+					  	       		         	item.css("DATA").text.split("/")[1], 
+				   		    	        	 	item.css("VALOR").text)
+					end
+				end
+
+				i = i + 1
 			end
-		       end
 		end
 
 		return data_collection 
