@@ -86,7 +86,6 @@ describe Eba do
         end
 
         it "has no nils" do
-	  puts @data_result
           expect(@data_result.include? nil).to eq(false)
         end
       end
@@ -97,7 +96,6 @@ describe Eba do
         end
 
         it "has no nils" do
-	  puts @data_result
           expect(@data_result.include? nil).to eq(false)
         end
       end
