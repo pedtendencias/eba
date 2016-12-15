@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.4.3"
+  VERSION = "1.5.3"
 
   #Version 1.0.1
   #
@@ -36,4 +36,8 @@ module Eba
 
   #Version 1.4.3
   # get_all_data_for_array now handles different periodicities for any ammount of codes.
+
+  #Version 1.5.3
+  # adds flag in data to mark seasonally adjusted data
+  # adds detection for seasonally adjusted data
 end
