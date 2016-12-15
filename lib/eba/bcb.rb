@@ -80,9 +80,9 @@ class BCB < Encoder
 		encoded_name = encode(name)
 		encoded_periodicity = encode(periodicity)
 		encoded_unit = encode(unit)
-		encoded_day = encode(day)
-		encoded_month = encode(month)
-		encoded_year = encode(year)
+		encoded_day = day
+		encoded_month = month
+		encoded_year = year
 		encoded_value = encode(value)
 
 		is_unseasoned = name.include? " - com ajuste sazonal"
@@ -152,15 +152,13 @@ class BCB < Encoder
 
 				# try and catch, as some series can be discontinued or a code may be broken
 				begin
-					response = @service.call(:get_valores_series_xml, message: message)
-					result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response] \
-			   						       [:get_valores_series_xml_return])
-
+					response = @service.call(:get_valores_series_xml, message: message)	
+					result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response][:get_valores_series_xml_return])
 				rescue Exception => erro
-					puts "Error requesting! #{erro}"
+					puts "\n\nError requesting! #{erro}\n\n"
 				end
 
-				i = 0
+				i = 0	
 
 				result.css("SERIE").each do |serie|
 					# recover identifying data from the getLastValue method,
