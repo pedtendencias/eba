@@ -8,11 +8,12 @@ class Data_bcb
 	@date = ""
 	@value = 0.0	
 	@pk = 0
+	@seasonally_adjusted = false
 
 	# Initialization is expected to express the state of a single row of 
 	# data inside the BCB's Database.
 	def initialize(series_name, series_code, series_periodicity, series_unit, 
-		       series_day, series_month, series_year, series_value)
+		       series_day, series_month, series_year, series_value, seasonally_adjusted)
 
 		@name = series_name
 		@pk = series_code
@@ -20,6 +21,7 @@ class Data_bcb
 		@unit = series_unit
 		@date = standardizes_date(series_day, series_month, series_year)
 		@value = series_value.to_f
+		@seasonally_adjusted = seasonally_adjusted
 	end	
 	
 	# Return an "identification key" with data which should 
@@ -56,6 +58,10 @@ class Data_bcb
 		return @value
 	end
 
+	def seasonally_adjusted
+		return @seasonally_adjusted
+	end
+
 	# The Webservice will always supply the date in three separate fields,
 	# this methods aim to convert it to a standard dd.mm.YYYY string.
 	def standardizes_date(day, month, year)
@@ -73,7 +79,11 @@ class Data_bcb
 	end
 	
 	def print()
-		return "Name: #{@name}\nBCB Code: #{@pk}\nPeriodicity: #{@periodicity}\nUnit: #{@unit}\nDate: #{@date}   Value: #{@value}\n"
+		return "Name: #{@name}\n" + 
+		       "BCB Code: #{@pk}\n" + 
+		       "Periodicity: #{@periodicity}\n" + 
+		       "Unit: #{@unit}   Seasonally Adjusted? #{@seasonally_adjusted ? 'YES' : 'NO'}\n" + 
+		       "Date: #{@date}   Value: #{@value}\n"
 	end
 
 	# Simple comparission between two DataBCB objects.
@@ -81,6 +91,6 @@ class Data_bcb
 		return (@name == data_bcb.name and @pk == data_bcb.pk \
 		    and @periodicity == data_bcb.periodicity \
 		    and @unit == data_bcb.unit and @date == data_bcb.date \
-		    and @value = data_bcb.value)
+		    and @value = data_bcb.value and @seasonally_adjusted == data_bcb.seasonally_adjusted)
 	end
 end
