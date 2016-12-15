@@ -34,8 +34,8 @@ class BCB < Encoder
 
 
 		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl",
-					ssl_cert_file: @pub_key})#,
-					#headers: {'Accept-Encoding' => 'gzip, deflate'}})
+					ssl_cert_file: @pub_key,
+					headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
 
 	# List of all operations available for the webservice,
@@ -76,6 +76,26 @@ class BCB < Encoder
 		return result
 	end
 
+	def build_bcb_data(name, code, periodicity, unit, day, month, year, value)
+		encoded_name = encode(name)
+		encoded_periodicity = encode(periodicity)
+		encoded_unit = encode(unit)
+		encoded_day = encode(day)
+		encoded_month = encode(month)
+		encoded_year = encode(year)
+		encoded_value = encode(value)
+
+		is_unseasoned = name.include? " - com ajuste sazonal"
+
+		if is_unseasoned then
+			name.slice! " - com ajuste sazonal"
+		end
+		
+		return Data_bcb.new(encoded_name, code, encoded_periodicity,
+				    encoded_unit, encoded_day, encoded_month,
+				    encoded_year, encoded_value, is_unseasoned)
+	end
+
 	def get_last_value(series_code)
 		begin
 			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
@@ -93,14 +113,14 @@ class BCB < Encoder
 		# MES = MONTH
 		# ANO = YEAR
 		# VALOR = VALUE
-		return Data_bcb.new(encode(xmlResult.search("NOME").text), 
-				   series_code, 
-				   encode(xmlResult.search("PERIODICIDADE").text), 
-				   encode(xmlResult.search("UNIDADE").text), 
-				   encode(xmlResult.search("DIA").text), 
-				   encode(xmlResult.search("MES").text), 
-				   encode(xmlResult.search("ANO").text), 
-				   encode(xmlResult.search("VALOR").text)) 
+		return build_bcb_data(xmlResult.search("NOME").text, 
+				      series_code, 
+				      xmlResult.search("PERIODICIDADE").text, 
+				      xmlResult.search("UNIDADE").text, 
+				      xmlResult.search("DIA").text, 
+				      xmlResult.search("MES").text, 
+				      xmlResult.search("ANO").text, 
+				      xmlResult.search("VALOR").text) 
 	end
 
 	# Ensure that date is in the format dd/MM/YYY
@@ -151,14 +171,26 @@ class BCB < Encoder
  
 					if serie.inspect.include? comp
 						serie.css("ITEM").each do |item|
-							data_collection << Data_bcb.new(encode(base_data.name), 
-						   			     	        array[i], 
-		 			  				   	        base_data.periodicity, 
-	   							   	                encode(base_data.unit), 
-						        	     	                "1", 
-					       			        	        item.css("DATA").text.split("/")[0], 
-					  	       			         	item.css("DATA").text.split("/")[1], 
-				   		    	        	 		item.css("VALOR").text)
+							dia = "1"
+							mes = "1"
+							ano = "1"
+							data = item.css("DATA").text.split("/")
+
+							if base_data.periodicity == 'D' then
+								dia = data[0]
+								mes = data[1]
+								ano = data[2]
+							else
+								mes = data[0]
+								ano = data[1]
+							end 
+
+							data_collection << build_bcb_data(base_data.name, 
+						   			     	          array[i], 
+		 			  				   	          base_data.periodicity, 
+	   							   	                  base_data.unit, 
+						        	     	                  dia, mes, ano, 
+				   		    	        	 		  item.css("VALOR").text)
 						end
 					end
 
