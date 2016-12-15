@@ -34,8 +34,8 @@ class BCB < Encoder
 
 
 		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl",
-					ssl_cert_file: @pub_key})#,
-					#headers: {'Accept-Encoding' => 'gzip, deflate'}})
+					ssl_cert_file: @pub_key}),
+					headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
 
 	# List of all operations available for the webservice,
