@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.5.3"
+  VERSION = "1.5.4"
 
   #Version 1.0.1
   #
@@ -40,4 +40,7 @@ module Eba
   #Version 1.5.3
   # adds flag in data to mark seasonally adjusted data
   # adds detection for seasonally adjusted data
+
+  #Version 1.5.4
+  # removed encoding vor day, month and year, as they can be integers and, therefore, haven't encoding
 end
