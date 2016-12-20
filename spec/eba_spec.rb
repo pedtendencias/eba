@@ -120,7 +120,7 @@ describe Eba do
     context "and requests data for two series" do
       before :all do
         @valid_series1 = 20541
-        @valid_series2 = 20542
+        @valid_series2 = 1
         @invalid_series = 98526 
 	@starting_date = "01/10/2016"
       end
