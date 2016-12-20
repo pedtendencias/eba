@@ -65,6 +65,23 @@ class Data_bcb
 	# The Webservice will always supply the date in three separate fields,
 	# this methods aim to convert it to a standard dd.mm.YYYY string.
 	def standardizes_date(day, month, year)
+		if day == '' or day == nil then
+			day = "01"
+		end
+
+		if month == '' or month == nil then
+			month = "01"
+		end
+
+		if year == '' or year == nil then
+			year = "1900"
+		end
+
+		if month.to_i > 1900 then
+			year = month
+			month = "01"
+		end
+
 		return "#{standardizes_number(day.to_i)}.#{standardizes_number(month.to_i)}.#{year}"
 	end
 

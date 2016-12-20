@@ -169,7 +169,7 @@ class BCB < Encoder
  
 					if serie.inspect.include? comp
 						serie.css("ITEM").each do |item|
-							dia = "1"
+							dia = "01"
 							mes = "1"
 							ano = "1"
 							data = item.css("DATA").text.split("/")
