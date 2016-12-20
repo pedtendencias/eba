@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.5.4"
+  VERSION = "1.5.5"
 
   #Version 1.0.1
   #
@@ -43,4 +43,7 @@ module Eba
 
   #Version 1.5.4
   # removed encoding vor day, month and year, as they can be integers and, therefore, haven't encoding
+
+  #Version 1.5.5
+  # promoted small change in order to handle a weird date style which BCB uses (i.e 01.2010.1900)
 end
