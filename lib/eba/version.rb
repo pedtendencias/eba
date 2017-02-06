@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.5.5"
+  VERSION = "1.5.6"
 
   #Version 1.0.1
   #
@@ -46,4 +46,7 @@ module Eba
 
   #Version 1.5.5
   # promoted small change in order to handle a weird date style which BCB uses (i.e 01.2010.1900)
+
+	#Version 1.5.6
+	# fixes identification and handling of seazonaly adjusted data points.
 end

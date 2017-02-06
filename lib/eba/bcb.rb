@@ -77,6 +77,12 @@ class BCB < Encoder
 	end
 
 	def build_bcb_data(name, code, periodicity, unit, day, month, year, value)
+		is_unseasoned = name.include? " - com ajuste sazonal"
+
+		if is_unseasoned then
+			name.slice! " - com ajuste sazonal"
+		end		
+
 		encoded_name = encode(name)
 		encoded_periodicity = encode(periodicity)
 		encoded_unit = encode(unit)
@@ -84,12 +90,6 @@ class BCB < Encoder
 		encoded_month = month
 		encoded_year = year
 		encoded_value = encode(value)
-
-		is_unseasoned = name.include? " - com ajuste sazonal"
-
-		if is_unseasoned then
-			name.slice! " - com ajuste sazonal"
-		end
 		
 		return Data_bcb.new(encoded_name, code, encoded_periodicity,
 				    encoded_unit, encoded_day, encoded_month,
@@ -113,6 +113,7 @@ class BCB < Encoder
 		# MES = MONTH
 		# ANO = YEAR
 		# VALOR = VALUE
+
 		return build_bcb_data(xmlResult.search("NOME").text, 
 				      series_code, 
 				      xmlResult.search("PERIODICIDADE").text, 
