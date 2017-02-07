@@ -27,8 +27,17 @@ class Data_bcb
 	# Return an "identification key" with data which should 
 	# be unique to a series (grouped).
 	def key()
-		return @name + @periodicity.to_s + @unity
+		return @name + @periodicity.to_s + @unit
 	end
+
+	def is_valid?
+		return @name != nil and @name != '' and 
+					 @periodicity != nil and @periodicity >= 0 and
+					 @unit != nil and @unit != '' and 
+					 @date != nil and @date != '' and
+					 @value != nil and @pk != nil
+	end
+
 	
 	# Note that there are no set methods in this class,
 	# I built it in such a way that you are only intended
