@@ -102,7 +102,10 @@ class BCB < Encoder
 		rescue
 			return nil
 		end
-		xmlResult = Nokogiri::XML(response.to_hash[:get_ultimo_valor_xml_response][:get_ultimo_valor_xml_return], nil, 'UTF-8')
+
+		response = response.to_hash[:get_ultimo_valor_xml_response][:get_ultimo_valor_xml_return].sub("&", "-_1532_-")
+
+		xmlResult = Nokogiri::XML(response)
 
 		# As it's a brazillian database it's column identifications are in portuguese,
 		# the translation for the fields, in order, are:
@@ -114,10 +117,10 @@ class BCB < Encoder
 		# ANO = YEAR
 		# VALOR = VALUe
 
-		return build_bcb_data(xmlResult.search("NOME").text, 
+		return build_bcb_data(xmlResult.search("NOME").text.sub("-_1532_-", "&"), 
 				      						series_code, 
 													xmlResult.search("PERIODICIDADE").text, 
-													xmlResult.search("UNIDADE").text, 
+													xmlResult.search("UNIDADE").text.sub("-_1532_-", "&"), 
 													xmlResult.search("DIA").text, 
 													xmlResult.search("MES").text, 
 													xmlResult.search("ANO").text, 
