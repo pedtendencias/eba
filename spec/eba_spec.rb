@@ -51,32 +51,9 @@ describe Eba do
           expect(@data_object != nil).to eq(true)
         end
 
-        it "has a non nil name" do
-				  expect(@data_object.name != nil).to eq(true)
+        it "is valid" do
+				  expect(@data_object.is_valid?).to eq(true)
         end
-
-				it "has a numeric pk greater than 0" do
-				  test = @data_object.pk.to_i > 0 rescue false
-				  expect(test).to eq(true)
-				end
-
-				it "has a valid float value" do
-				  test = @data_object.value.to_f != nil rescue false
-				  expect(test).to eq(true)
-				end
-
-				it "has a periodicity composed of a single character" do
-				  expect(@data_object.periodicity.length).to eq(1)
-				end
-
-				it "has a non nil unit" do
-				  expect(@data_object.unit != nil).to eq(true)
-				end
-
-				it "has a valid date" do
-				  test = DateTime.parse(@data_object.date).to_date != nil rescue false
-     		  expect(test).to eq(true)
-				end
       end
 
       context "and the requested series is a valid one" do 
@@ -92,31 +69,8 @@ describe Eba do
           expect(@data_object != nil).to eq(true)
         end
 
-        it "has a non nil name" do
-				  expect(@data_object.name != nil).to eq(true)
-        end
-
-				it "has a numeric pk greater than 0" do
-				  test = @data_object.pk.to_i > 0 rescue false
-				  expect(test).to eq(true)
-				end
-
-				it "has a valid float value" do
-				  test = @data_object.value.to_f != nil rescue false
-				  expect(test).to eq(true)
-				end
-
-				it "has a periodicity composed of a single character" do
-				  expect(@data_object.periodicity.length).to eq(1)
-				end
-
-				it "has a non nil unit" do
-				  expect(@data_object.unit != nil).to eq(true)
-				end
-
-				it "has a valid date" do
-				  test = DateTime.parse(@data_object.date).to_date != nil rescue false
-     		  expect(test).to eq(true)
+        it "is valid" do
+					expect(@data_object.is_valid?).to eq(true)
 				end
       end
     end
@@ -141,31 +95,8 @@ describe Eba do
 						expect(@data_result.include? nil).to eq(false)
 					end	
 			
-					it "has a non nil name" do
-						expect(@data_object.name != nil).to eq(true)
-					end
-
-					it "has a numeric pk greater than 0" do
-						test = @data_object.pk.to_i > 0 rescue false
-						expect(test).to eq(true)
-					end
-
-					it "has a valid float value" do
-						test = @data_object.value.to_f != nil rescue false
-						expect(test).to eq(true)
-					end
-
-					it "has a periodicity composed of a single character" do
-						expect(@data_object.periodicity.length).to eq(1)
-					end
-
-					it "has a non nil unit" do
-						expect(@data_object.unit != nil).to eq(true)
-					end
-
-					it "has a valid date" do
-						test = DateTime.parse(@data_object.date).to_date != nil rescue false
-						expect(test).to eq(true)
+					it "is valid" do
+						expect(@data_object.is_valid?).to eq(true)
 					end
 				end
       end
@@ -173,7 +104,7 @@ describe Eba do
 			context "using a single valid serie which is seasonally adjusted" do
 				before :all do
 					array = [@valid_series2]
-					@data_result = @eba.get_all_data_for_array
+					@data_result = @eba.get_all_data_for_array(array, "01/01/1900")
 					@data_point = @data_result[0]
 				end
 		
@@ -182,31 +113,8 @@ describe Eba do
 				end			
 		
 				context "its data points" do
-					it "have a non nil name" do
-						expect(@data_point.name != nil).to eq(true)
-					end
-
-					it "have a numeric pk greater than 0" do
-						test = @data_point.pk.to_i > 0 rescue false
-						expect(test).to eq(true)
-					end
-
-					it "have a valid float value" do
-						test = @data_point.value.to_f != nil rescue false
-						expect(test).to eq(true)
-					end
-
-					it "have a periodicity composed of a single character" do
-						expect(@data_point.periodicity.length).to eq(1)
-					end
-
-					it "have a non nil unit" do
-						expect(@data_point.unit != nil).to eq(true)
-					end
-
-					it "have a valid date" do
-						test = DateTime.parse(@data_point.date).to_date != nil rescue false
-						expect(test).to eq(true)
+					it "are valid" do
+						expect(@data_point.is_valid?).to eq(true)
 					end
 	
 					it "are identified as seasonally adjusted" do
