@@ -80,65 +80,136 @@ describe Eba do
       end
 
       context "and the requested series is a valid one" do 
-	before :all do
-	  @data_object = @eba.get_last_value(@valid_series)
-	end
+				before :all do
+				  @data_object = @eba.get_last_value(@valid_series)
+				end
 	
-	it "is identified as non seazonally adjusted" do
-	  expect(@data_object.seasonally_adjusted).to eq(false)
-	end
+				it "is identified as non seazonally adjusted" do
+				  expect(@data_object.seasonally_adjusted).to eq(false)
+				end
 
-	it "is not nil" do
+				it "is not nil" do
           expect(@data_object != nil).to eq(true)
         end
 
         it "has a non nil name" do
-	  expect(@data_object.name != nil).to eq(true)
+				  expect(@data_object.name != nil).to eq(true)
         end
 
-	it "has a numeric pk greater than 0" do
-	  test = @data_object.pk.to_i > 0 rescue false
-	  expect(test).to eq(true)
-	end
+				it "has a numeric pk greater than 0" do
+				  test = @data_object.pk.to_i > 0 rescue false
+				  expect(test).to eq(true)
+				end
 
-	it "has a valid float value" do
-	  test = @data_object.value.to_f != nil rescue false
-	  expect(test).to eq(true)
-	end
+				it "has a valid float value" do
+				  test = @data_object.value.to_f != nil rescue false
+				  expect(test).to eq(true)
+				end
 
-	it "has a periodicity composed of a single character" do
-	  expect(@data_object.periodicity.length).to eq(1)
-	end
+				it "has a periodicity composed of a single character" do
+				  expect(@data_object.periodicity.length).to eq(1)
+				end
 
-	it "has a non nil unit" do
-	  expect(@data_object.unit != nil).to eq(true)
-	end
+				it "has a non nil unit" do
+				  expect(@data_object.unit != nil).to eq(true)
+				end
 
-	it "has a valid date" do
-	  test = DateTime.parse(@data_object.date).to_date != nil rescue false
-     	  expect(test).to eq(true)
-	end
+				it "has a valid date" do
+				  test = DateTime.parse(@data_object.date).to_date != nil rescue false
+     		  expect(test).to eq(true)
+				end
       end
     end
 
     context "and requests data for two series" do
       before :all do
         @valid_series1 = 7824 
-        @valid_series2 = 1
+        @valid_series2 = 24364
         @invalid_series = 98526 
-	@starting_date = "01/10/2016"
+				@starting_date = "01/10/2016"
       end
 
       context "using two valid series" do
         before :all do
-	  array = [@valid_series1, @valid_series2] 
+				  array = [@valid_series1, @valid_series2] 
           @data_result = @eba.get_all_data_for_array(array, @starting_date)
+					@data_object = @data_result[0]
         end
 
-        it "has no nils" do
-          expect(@data_result.include? nil).to eq(false)
-        end
+				context "its result" do				
+					it "has a non nil name" do
+						expect(@data_object.name != nil).to eq(true)
+					end
+
+					it "has a numeric pk greater than 0" do
+						test = @data_object.pk.to_i > 0 rescue false
+						expect(test).to eq(true)
+					end
+
+					it "has a valid float value" do
+						test = @data_object.value.to_f != nil rescue false
+						expect(test).to eq(true)
+					end
+
+					it "has a periodicity composed of a single character" do
+						expect(@data_object.periodicity.length).to eq(1)
+					end
+
+					it "has a non nil unit" do
+						expect(@data_object.unit != nil).to eq(true)
+					end
+
+					it "has a valid date" do
+						test = DateTime.parse(@data_object.date).to_date != nil rescue false
+						expect(test).to eq(true)
+					end
+
+					it "has no nils" do
+						expect(@data_result.include? nil).to eq(false)
+					end
+				end
       end
+
+			context "using a single valid serie which is seasonally adjusted" do
+				before :all do
+					array = [@valid_series2]
+					@data_result = @eba.get_all_data_for_array
+					@data_point = @data_result[0]
+				end
+					
+				context "its data points" do
+					it "have a non nil name" do
+						expect(@data_point.name != nil).to eq(true)
+					end
+
+					it "have a numeric pk greater than 0" do
+						test = @data_point.pk.to_i > 0 rescue false
+						expect(test).to eq(true)
+					end
+
+					it "have a valid float value" do
+						test = @data_point.value.to_f != nil rescue false
+						expect(test).to eq(true)
+					end
+
+					it "have a periodicity composed of a single character" do
+						expect(@data_point.periodicity.length).to eq(1)
+					end
+
+					it "have a non nil unit" do
+						expect(@data_point.unit != nil).to eq(true)
+					end
+
+					it "have a valid date" do
+						test = DateTime.parse(@data_point.date).to_date != nil rescue false
+						expect(test).to eq(true)
+					end
+	
+					it "are identified as seasonally adjusted" do
+						expect(@data_point.seasonally_adjusted).to eq(true)
+					end					
+				end
+			end
 
       context "one of the requested series is invalid" do
         before :all do
