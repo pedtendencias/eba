@@ -3,7 +3,7 @@
 # information.
 class Data_bcb
 	@name = ""
-	@periodicity = 0
+	@periodicity = ""
 	@unit = ""
 	@date = ""
 	@value = 0.0	
@@ -17,7 +17,7 @@ class Data_bcb
 
 		@name = series_name
 		@pk = series_code
-		@periodicity = series_periodicity
+		@periodicity = series_periodicity.to_s
 		@unit = series_unit
 		@date = standardizes_date(series_day, series_month, series_year)
 		@value = series_value.to_f
@@ -31,11 +31,48 @@ class Data_bcb
 	end
 
 	def is_valid?
-		return @name != nil and @name != '' and 
-					 @periodicity != nil and @periodicity >= 0 and
-					 @unit != nil and @unit != '' and 
-					 @date != nil and @date != '' and
-					 @value != nil and @pk != nil
+	
+		if @name == nil or @name == '' then
+			puts "Found invalid name! Value is '#{@name}'"
+			return false
+		end
+
+		if @periodicity == nil or @periodicity == '' or @periodicity.length > 1 then
+			puts "Found invalid periodicity! Value is '#{@periodicity}'"
+			return false
+		end
+		
+		if @unit == nil or @unit == '' then
+			puts "Found invalid unit! Value is '#{@unit}'"
+			return false
+		end
+
+		if @date == nil or @date == '' then
+			puts "Found invalid date! Value is '#{@date}'"
+			return false
+		else
+			if !(DateTime.parse(@date).to_date != nil rescue false) then
+				puts "Found invalid date! Value is '#{@date}'"
+				return false
+			end
+		end
+
+		if @value == nil then
+			puts "Found invalid value! Value is '#{@value}'"
+			return false
+		else
+			if !(@value.to_f != nil rescue false) then
+				puts "Found invalid value! Value is '#{@value}'"	
+				return false
+			end
+		end
+
+		if @pk == nil or  @pk <= 0 then
+			puts "Found invalid pk! Value is '#{@pk}'"
+			return false
+		end
+
+		return true
 	end
 
 	
