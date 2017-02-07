@@ -136,7 +136,11 @@ describe Eba do
 					@data_object = @data_result[0]
         end
 
-				context "its result" do				
+				context "its result" do
+					it "has no nils" do
+						expect(@data_result.include? nil).to eq(false)
+					end	
+			
 					it "has a non nil name" do
 						expect(@data_object.name != nil).to eq(true)
 					end
@@ -163,10 +167,6 @@ describe Eba do
 						test = DateTime.parse(@data_object.date).to_date != nil rescue false
 						expect(test).to eq(true)
 					end
-
-					it "has no nils" do
-						expect(@data_result.include? nil).to eq(false)
-					end
 				end
       end
 
@@ -176,7 +176,11 @@ describe Eba do
 					@data_result = @eba.get_all_data_for_array
 					@data_point = @data_result[0]
 				end
-					
+		
+				it "has no nils" do
+					expect(@data_result.include? nil).to eq(false)
+				end			
+		
 				context "its data points" do
 					it "have a non nil name" do
 						expect(@data_point.name != nil).to eq(true)
