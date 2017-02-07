@@ -8,21 +8,21 @@ require_relative "data"
 class BCB < Encoder
 
 	################################################################################################
-	# 											       #
-	# You MUST supply a valid certificate in order for the connection to work!		       #
-	# The certificate you are looking for is located in this webpage:			       #
-	# 	http://www.bcb.gov.br/?CERTDIG							       #
-	#											       #
-	# It will the most recent one which looks something like:				       #
-	#	Cadeia de CAs de *.bcb.gov.br (yyyy)						       #
-	#											       #
-	# You then have to generate a public key from this crt file,				       #
-	# you can do so by following this StackOverflow post:					       #
-	#	http://stackoverflow.com/questions/5244129/use-rsa-private-key-to-generate-public-key  #
-	#											       #
-	# With all this done, you will be able to access freely this 				       #
+	# 											       																																 #
+	# You MUST supply a valid certificate in order for the connection to work!		       					 #
+	# The certificate you are looking for is located in this webpage:			       									 #
+	# 	http://www.bcb.gov.br/?CERTDIG							       																				 #
+	#											       																																	 #
+	# It will the most recent one which looks something like:				       												 #
+	#	Cadeia de CAs de *.bcb.gov.br (yyyy)						       																			 #
+	#											       																																	 #
+	# You then have to generate a public key from this crt file,				       										 #
+	# you can do so by following this StackOverflow post:					       													 #
+	#	http://stackoverflow.com/questions/5244129/use-rsa-private-key-to-generate-public-key  			 #
+	#											       																																	 #
+	# With all this done, you will be able to access freely this 				       										 #
 	# service, without much hassle.	Don't forget to upvote such an useful answer.                  #
-	#											       #
+	#											       																																	 #
 	################################################################################################
 
 	def initialize(path_to_certificate)
@@ -34,8 +34,8 @@ class BCB < Encoder
 
 
 		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl",
-					ssl_cert_file: @pub_key,
-					headers: {'Accept-Encoding' => 'gzip, deflate'}})
+														 ssl_cert_file: @pub_key,
+														 headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
 
 	# List of all operations available for the webservice,
@@ -92,8 +92,8 @@ class BCB < Encoder
 		encoded_value = encode(value)
 		
 		return Data_bcb.new(encoded_name, code, encoded_periodicity,
-				    encoded_unit, encoded_day, encoded_month,
-				    encoded_year, encoded_value, is_unseasoned)
+				    						encoded_unit, encoded_day, encoded_month,
+				    						encoded_year, encoded_value, is_unseasoned)
 	end
 
 	def get_last_value(series_code)
@@ -112,16 +112,16 @@ class BCB < Encoder
 		# DIA = DAY
 		# MES = MONTH
 		# ANO = YEAR
-		# VALOR = VALUE
+		# VALOR = VALUe
 
 		return build_bcb_data(xmlResult.search("NOME").text, 
-				      series_code, 
-				      xmlResult.search("PERIODICIDADE").text, 
-				      xmlResult.search("UNIDADE").text, 
-				      xmlResult.search("DIA").text, 
-				      xmlResult.search("MES").text, 
-				      xmlResult.search("ANO").text, 
-				      xmlResult.search("VALOR").text) 
+				      						series_code, 
+													xmlResult.search("PERIODICIDADE").text, 
+													xmlResult.search("UNIDADE").text, 
+													xmlResult.search("DIA").text, 
+													xmlResult.search("MES").text, 
+													xmlResult.search("ANO").text, 
+													xmlResult.search("VALOR").text) 
 	end
 
 	# Ensure that date is in the format dd/MM/YYY
@@ -148,8 +148,8 @@ class BCB < Encoder
 
 				# Build the  message from the start of the historical series
 				message = { in0: {long: codes}, 
-					    in1: date, 
-					    in2: Time.now.strftime('%d/%m/%Y').to_s}
+					    			in1: date, 
+					    			in2: Time.now.strftime('%d/%m/%Y').to_s}
 
 				# try and catch, as some series can be discontinued or a code may be broken
 				begin
@@ -184,12 +184,11 @@ class BCB < Encoder
 								ano = data[1]
 							end 
 
-							data_collection << build_bcb_data(base_data.name, 
-						   			     	          array[i], 
-		 			  				   	          base_data.periodicity, 
-	   							   	                  base_data.unit, 
-						        	     	                  dia, mes, ano, 
-				   		    	        	 		  item.css("VALOR").text)
+							data_collection << build_bcb_data(base_data.name, codes[i], 
+		 			  				   	          							base_data.periodicity, 
+	 				  							   	                  base_data.unit, 
+							        	     	                  dia, mes, ano, 
+				   								    	        	 		  item.css("VALOR").text)
 						end
 					end
 
