@@ -75,17 +75,17 @@ describe Eba do
       end
     end
 
-    context "and requests data for two series" do
+    context "and requests blocks of data" do
       before :all do
-        @valid_series1 = 7824 
-        @valid_series2 = 24364
+        @valid_series = 7824 
+        @valid_unseasoned_series = 24364
         @invalid_series = 98526 
 				@starting_date = "01/10/2016"
       end
 
       context "using two valid series" do
         before :all do
-				  array = [@valid_series1, @valid_series2] 
+				  array = [@valid_series, @valid_unseasoned_series] 
           @data_result = @eba.get_all_data_for_array(array, @starting_date)
 					@data_object = @data_result[0]
         end
@@ -103,8 +103,9 @@ describe Eba do
 
 			context "using a single valid serie which is seasonally adjusted" do
 				before :all do
-					array = [@valid_series2]
-					@data_result = @eba.get_all_data_for_array(array, "01/01/1900")
+					array = [@valid_unseasoned_series]
+					@data_result = @eba.get_all_data_for_array(array, @starting_date)
+					puts "Data result = #{@data_result}"
 					@data_point = @data_result[0]
 				end
 		
