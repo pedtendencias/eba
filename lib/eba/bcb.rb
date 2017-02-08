@@ -76,12 +76,14 @@ class BCB < Encoder
 		return result
 	end
 
-	def build_bcb_data(name, code, periodicity, unit, day, month, year, value)
-		is_unseasoned = name.include? " - com ajuste sazonal"
+	def build_bcb_data(name, code, periodicity, unit, day, month, year, value, is_unseasoned)
+		if is_unseasoned == nil then
+			is_unseasoned = name.include? " - com ajuste sazonal"
 
-		if is_unseasoned then
-			name.slice! " - com ajuste sazonal"
-		end		
+			if is_unseasoned then
+				name.slice! " - com ajuste sazonal"
+			end		
+		end
 
 		encoded_name = encode(name)
 		encoded_periodicity = encode(periodicity)
@@ -124,7 +126,7 @@ class BCB < Encoder
 													xmlResult.search("DIA").text, 
 													xmlResult.search("MES").text, 
 													xmlResult.search("ANO").text, 
-													xmlResult.search("VALOR").text) 
+													xmlResult.search("VALOR").text, nil) 
 	end
 
 	# Ensure that date is in the format dd/MM/YYY
@@ -162,7 +164,7 @@ class BCB < Encoder
 					puts "\n\nError requesting! #{erro}\n\n"
 				end
 
-				i = 0	
+				i = 0
 
 				result.css("SERIE").each do |serie|
 					# recover identifying data from the getLastValue method,
@@ -191,7 +193,8 @@ class BCB < Encoder
 		 			  				   	          							base_data.periodicity, 
 	 				  							   	                  base_data.unit, 
 							        	     	                  dia, mes, ano, 
-				   								    	        	 		  item.css("VALOR").text)
+				   								    	        	 		  item.css("VALOR").text,
+																								base_data.seasonally_adjusted)
 						end
 					end
 
