@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.5.6"
+  VERSION = "1.6.7"
 
   #Version 1.0.1
   #
@@ -49,4 +49,11 @@ module Eba
 
 	#Version 1.5.6
 	# fixes identification and handling of seazonaly adjusted data points.
+
+	#Version 1.6.7
+	# Treats exception caused by the character '&' on Nokogiri conversion.
+	# Correctly identifies and classifies seasonally adjusted data.
+	#
+	# Adds verifications of validity for data-type.
+	# Changes tests in order to incorporate validity detection.
 end
