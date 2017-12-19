@@ -104,8 +104,7 @@ describe Eba do
 			context "using a single valid serie which is seasonally adjusted" do
 				before :all do
 					array = [@valid_unseasoned_series]
-					@data_result = @eba.get_all_data_for_array(array, @starting_date)
-					puts "Data result = #{@data_result}"
+					@data_result = @eba.get_all_data_for_array(array, @starting_date)	
 					@data_point = @data_result[0]
 				end
 		
