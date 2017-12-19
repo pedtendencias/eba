@@ -130,7 +130,7 @@ class BCB < Encoder
 	end
 
 	# Ensure that date is in the format dd/MM/YYY
-	def get_all_data_for_array(array_of_codes, date)
+	def get_all_data_for_array(array_of_codes, min_date, max_date = Time.now.strftime('%d/%m/%Y').to_s)
 		result = nil
 		data_collection = Array.new()
 
@@ -153,8 +153,8 @@ class BCB < Encoder
 
 				# Build the  message from the start of the historical series
 				message = { in0: {long: codes}, 
-					    			in1: date, 
-					    			in2: Time.now.strftime('%d/%m/%Y').to_s}
+					    			in1: min_date, 
+					    			in2: max_date}
 
 				# try and catch, as some series can be discontinued or a code may be broken
 				begin

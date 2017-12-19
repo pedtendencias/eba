@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.6.7"
+  VERSION = "1.7.7"
 
   #Version 1.0.1
   #
@@ -56,4 +56,7 @@ module Eba
 	#
 	# Adds verifications of validity for data-type.
 	# Changes tests in order to incorporate validity detection.
+
+	#Version 1.7.7
+	# Adds support for max and minimun data for queries.
 end
