@@ -1,11 +1,11 @@
 module Eba
   # For documentation purposes:
-  # VERSION = mm.dd.ff.hh
+  # VERSION = mm.ff.hh
   # mm - major change
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.8.7"
+  VERSION = "1.8.8"
 
   #Version 1.0.1
   #
@@ -63,4 +63,7 @@ module Eba
 	#Version 1.8.7
 	# Improves the way the gem deals with no data in interval result. Returning an empty array, 
 	#		instead of an error.
+
+	#Version 1.8.8
+	# Forces conversion of error to string.
 end

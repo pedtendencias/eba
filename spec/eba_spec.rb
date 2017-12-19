@@ -81,12 +81,22 @@ describe Eba do
         @valid_unseasoned_series = 24364
         @invalid_series = 98526 
 				@starting_date = "01/10/2016"
+				@ending_date = "02/11/2017"
       end
+
+			context "using a valid series with an empty interval" do
+				it "returns an empty array" do
+					array = [@valid_series, @valid_unseasoned_series] 
+          @data_result = @eba.get_all_data_for_array(array, "01/01/1900", "01/01/1901")
+
+					expect(@data_result.length).to eq(0)
+				end
+			end
 
       context "using two valid series" do
         before :all do
 				  array = [@valid_series, @valid_unseasoned_series] 
-          @data_result = @eba.get_all_data_for_array(array, @starting_date)
+          @data_result = @eba.get_all_data_for_array(array, @starting_date, @ending_date)
 					@data_object = @data_result[0]
         end
 
