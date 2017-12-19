@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.7.7"
+  VERSION = "1.8.7"
 
   #Version 1.0.1
   #
@@ -59,4 +59,8 @@ module Eba
 
 	#Version 1.7.7
 	# Adds support for max and minimun data for queries.
+
+	#Version 1.8.7
+	# Improves the way the gem deals with no data in interval result. Returning an empty array, 
+	#		instead of an error.
 end
