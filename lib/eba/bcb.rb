@@ -162,7 +162,7 @@ class BCB < Encoder
 					result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response][:get_valores_series_xml_return])
 				rescue Exception => erro
 					#The interval is empty, therefore an empty array should be returned.
-					if erro.include? "Value(s) not found" then
+					if erro.to_s.include? "Value(s) not found" then
 						return []
 					else
 						puts "\n\nError requesting! #{erro}\n\n"				
