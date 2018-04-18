@@ -101,7 +101,8 @@ class BCB < Encoder
 	def get_last_value(series_code)
 		begin
 			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
-		rescue
+		rescue => e
+			puts "Error requesting last value. Error: #{e}\nTrace: #{e.backtrace}"
 			return nil
 		end
 
@@ -165,7 +166,7 @@ class BCB < Encoder
 					if erro.to_s.include? "Value(s) not found" then
 						return []
 					else
-						puts "\n\nError requesting! #{erro}\n\n"				
+						puts "\n\nError requesting! #{erro}\nTrace: #{erro.backtrace}\n\n"				
 					end
 				end
 

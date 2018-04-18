@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.8.8"
+  VERSION = "1.9.8"
 
   #Version 1.0.1
   #
@@ -66,4 +66,7 @@ module Eba
 
 	#Version 1.8.8
 	# Forces conversion of error to string.
+
+	#Version 1.9.8
+	# Improves logging by adding trace.
 end
