@@ -96,6 +96,7 @@ describe Eba do
       context "using two valid series" do
         before :all do
 				  array = [@valid_series, @valid_unseasoned_series] 
+
           @data_result = @eba.get_all_data_for_array(array, @starting_date, @ending_date)
 					@data_object = @data_result[0]
         end
@@ -142,6 +143,20 @@ describe Eba do
           expect(@data_result.include? nil).to eq(false)
         end
       end
+
+			context "the requested range is out of bounds" do
+				it "can properly handle the situation" do
+					begin
+						data_result = @eba.get_all_data_for_array([@valid_series1], @starting_date, '01/01/2300')
+					rescue => e
+						data_result = nil
+					end
+					
+					expect(data_result != nil).to eq(true)
+					expect(data_result.class.to_s.downcase).to eq('array')
+					expect(data_result.size).to eq(0)
+				end
+			end
     end
   end
 end

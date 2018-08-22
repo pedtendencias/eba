@@ -65,12 +65,16 @@ class BCB < Encoder
 
 		purged_array_of_codes.each do |code|
 			dado = get_last_value(code)
-	
-			if not result.key? dado.periodicity then
-				result[dado.periodicity] = []
-			end
 
-			result[dado.periodicity] << dado
+			if dado == nil then
+				puts "No valid last value for #{code}."
+			else
+				if not result.key? dado.periodicity then
+					result[dado.periodicity] = []
+				end
+
+				result[dado.periodicity] << dado
+			end
 		end
 
 		return result
@@ -101,8 +105,21 @@ class BCB < Encoder
 	def get_last_value(series_code)
 		begin
 			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
+
 		rescue => e
-			puts "Error requesting last value. Error: #{e}\nTrace: #{e.backtrace}"
+			if e.message.to_s["No such operation 'getUltimoValorXML'"] != nil || 
+				 e.message.to_s["Server.userException"] != nil then
+				#This error is expetected, it only means that the code is invalid.
+
+			elsif e.message.to_s["nil:NilClass"] != nil || 
+						e.message.to_s["Connection reset by peer"] != nil then
+				sleep(1)
+				get_last_value(series_code)
+
+			else
+				puts "Error requesting last value.\nMessage: #{e.message}\nTrace: #{e.backtrace}"
+			end
+
 			return nil
 		end
 
@@ -133,7 +150,7 @@ class BCB < Encoder
 	# Ensure that date is in the format dd/MM/YYY
 	def get_all_data_for_array(array_of_codes, min_date, max_date = Time.now.strftime('%d/%m/%Y').to_s)
 		result = nil
-		data_collection = Array.new()
+		data_collection = Array.new()		
 
 		# This request has a limit of series he can get at a time, thus
 		# it's way simpler to break a composite requests in various smaller
@@ -157,58 +174,73 @@ class BCB < Encoder
 					    			in1: min_date, 
 					    			in2: max_date}
 
-				# try and catch, as some series can be discontinued or a code may be broken
-				begin
-					response = @service.call(:get_valores_series_xml, message: message)	
-					result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response][:get_valores_series_xml_return])
-				rescue Exception => erro
-					#The interval is empty, therefore an empty array should be returned.
-					if erro.to_s.include? "Value(s) not found" then
-						return []
-					else
-						puts "\n\nError requesting! #{erro}\nTrace: #{erro.backtrace}\n\n"				
+				result = send_message(message)
+	
+				if result != [] then
+					i = 0	
+
+					result.css("SERIE").each do |serie|
+						extract_an_item(serie, codes[i], data_array[i], data_collection)
+						i = i + 1
 					end
-				end
-
-				i = 0
-
-				result.css("SERIE").each do |serie|
-					# recover identifying data from the getLastValue method,
-					# as the get_valores_series_xml desn't have identifying data
-					# as series name, periodicity, etc. 
-					base_data = data_array[i]
-					comp = 'name="ID" value="' + codes[i].to_s + '"'
- 
-					if serie.inspect.include? comp
-						serie.css("ITEM").each do |item|
-							dia = "01"
-							mes = "1"
-							ano = "1"
-							data = item.css("DATA").text.split("/")
-
-							if base_data.periodicity == 'D' then
-								dia = data[0]
-								mes = data[1]
-								ano = data[2]
-							else
-								mes = data[0]
-								ano = data[1]
-							end 
-
-							data_collection << build_bcb_data(base_data.name, codes[i], 
-		 			  				   	          							base_data.periodicity, 
-	 				  							   	                  base_data.unit, 
-							        	     	                  dia, mes, ano, 
-				   								    	        	 		  item.css("VALOR").text,
-																								base_data.seasonally_adjusted)
-						end
-					end
-
-					i = i + 1
 				end
 			end
 		end
 
 		return data_collection 
+	end
+
+	def extract_an_item(serie, code, base_data, data_collection)
+		# recover identifying data from the getLastValue method,
+		# as the get_valores_series_xml desn't have identifying data
+		# as series name, periodicity, etc. 
+	 
+		if serie.inspect["name=\"ID\" value=\"#{code}\""] != nil then
+			serie.css("ITEM").each do |item|
+				dia = "01"
+				mes = "1"
+				ano = "1"
+				data = item.css("DATA").text.split("/")
+
+				if base_data.periodicity == 'D' then
+					dia = data[0]
+					mes = data[1]
+					ano = data[2]
+				else
+					mes = data[0]
+					ano = data[1]
+				end 
+
+				data_collection << build_bcb_data(base_data.name, code, 
+																					base_data.periodicity, 
+																					base_data.unit, 
+																					dia, mes, ano, 
+																					item.css("VALOR").text,
+																					base_data.seasonally_adjusted)
+			end
+		end
+	end
+
+	def send_message(message)
+		# try and catch, as some series can be discontinued or a code may be broken
+		begin
+			response = @service.call(:get_valores_series_xml, message: message)	
+			result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response][:get_valores_series_xml_return])
+		rescue Exception => erro
+			#The interval is empty, therefore an empty array should be returned.
+			if erro.to_s.include? "Value(s) not found" then
+				puts "Some of the codes might be invalid. Requested: #{message[:in0][:long]}."
+				return []
+
+			elsif erro.message.to_s["Socket closed"] != nil then
+				sleep(1)
+				puts "\n\nSocket closed for message #{message[:in0][:long]}, trying again."
+				send_message(message)						
+
+			else
+				puts "\n\nError requesting all data for the range [#{min_date}, #{max_date}] for codes #{message[:in0][:long]}! #{erro}\nTrace: #{erro.backtrace}\nMessage: #{erro.message}\n"				
+				return []
+			end
+		end
 	end
 end

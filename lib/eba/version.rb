@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.9.8"
+  VERSION = "1.10.0"
 
   #Version 1.0.1
   #
@@ -69,4 +69,8 @@ module Eba
 
 	#Version 1.9.8
 	# Improves logging by adding trace.
+
+	#Version 1.10.0
+	# Agressively handles connection errors with BCB webservice, due to detecting a huge
+	# 	ammount of hangups and such and such erros whilst using the gem.
 end
