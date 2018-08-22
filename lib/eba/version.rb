@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.10.0"
+  VERSION = "1.10.1"
 
   #Version 1.0.1
   #
@@ -73,4 +73,7 @@ module Eba
 	#Version 1.10.0
 	# Agressively handles connection errors with BCB webservice, due to detecting a huge
 	# 	ammount of hangups and such and such erros whilst using the gem.
+
+	#Version 1.10.1
+	# Rolling back on trying to retry every miss on the webservice and just handling errors apropriatelly.
 end

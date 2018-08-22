@@ -106,15 +106,15 @@ class BCB < Encoder
 		begin
 			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
 
-		rescue => e
+		rescue Exception => e
 			if e.message.to_s["No such operation 'getUltimoValorXML'"] != nil || 
 				 e.message.to_s["Server.userException"] != nil then
 				#This error is expetected, it only means that the code is invalid.
 
 			elsif e.message.to_s["nil:NilClass"] != nil || 
-						e.message.to_s["Connection reset by peer"] != nil then
-				sleep(1)
-				get_last_value(series_code)
+						e.message.to_s["Connection reset by peer"] != nil || 
+						e.message.to_s["Failed to open TCP connection"] != nil then
+				puts "Will have to try again, webservice dropped the ball.\nError: #{e.message}"
 
 			else
 				puts "Error requesting last value.\nMessage: #{e.message}\nTrace: #{e.backtrace}"
@@ -233,9 +233,7 @@ class BCB < Encoder
 				return []
 
 			elsif erro.message.to_s["Socket closed"] != nil then
-				sleep(1)
-				puts "\n\nSocket closed for message #{message[:in0][:long]}, trying again."
-				send_message(message)						
+				puts "\n\nSocket closed for message #{message[:in0][:long]}, try again."
 
 			else
 				puts "\n\nError requesting all data for the range [#{min_date}, #{max_date}] for codes #{message[:in0][:long]}! #{erro}\nTrace: #{erro.backtrace}\nMessage: #{erro.message}\n"				
