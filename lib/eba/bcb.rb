@@ -115,7 +115,7 @@ class BCB < Encoder
 						e.message.to_s["Connection reset by peer"] != nil || 
 						e.message.to_s["Failed to open TCP connection"] != nil || 
 						e.message.to_s["Socket closed"] != nil then
-				puts "Will have to try again, webservice dropped the ball.\nError: #{e.message}"
+				puts "Will have to try last value again for #{series_code}, webservice dropped the ball.\nError: #{e.message}"
 
 			else
 				puts "Error requesting last value.\nMessage: #{e.message}\nTrace: #{e.backtrace}"
