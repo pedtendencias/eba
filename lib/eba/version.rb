@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.10.1"
+  VERSION = "1.10.2"
 
   #Version 1.0.1
   #
@@ -76,4 +76,7 @@ module Eba
 
 	#Version 1.10.1
 	# Rolling back on trying to retry every miss on the webservice and just handling errors apropriatelly.
+	
+	#Version 1.10.2
+	# Adds "Socket closed" error to last value expcetion handling.
 end

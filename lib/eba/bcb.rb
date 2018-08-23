@@ -113,7 +113,8 @@ class BCB < Encoder
 
 			elsif e.message.to_s["nil:NilClass"] != nil || 
 						e.message.to_s["Connection reset by peer"] != nil || 
-						e.message.to_s["Failed to open TCP connection"] != nil then
+						e.message.to_s["Failed to open TCP connection"] != nil || 
+						e.message.to_s["Socket closed"] != nil then
 				puts "Will have to try again, webservice dropped the ball.\nError: #{e.message}"
 
 			else
