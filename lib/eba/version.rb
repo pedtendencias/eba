@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "1.10.2"
+  VERSION = "1.11.0"
 
   #Version 1.0.1
   #
@@ -79,4 +79,8 @@ module Eba
 	
 	#Version 1.10.2
 	# Adds "Socket closed" error to last value expcetion handling.
+
+	#Versuib 1.11.0
+	# Refactors and simplifies interactions with target webservice. Methods no longer return nil,
+	#		but an invalid Data_bcb object.
 end

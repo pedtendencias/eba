@@ -19,7 +19,7 @@ describe Eba do
     context "and requests the last value for an series" do
       # As of 2016-11-22 98526 was an invalid series.
       before :all do
-				@valid_series = 7900  
+				@valid_series = 22815 
 				@seasonally_adjusted = 24364 	
         @invalid_series = 98526 
       end
@@ -29,9 +29,13 @@ describe Eba do
 				  @data_object = @eba.get_last_value(@invalid_series)
 				end
 
-        it "is nil" do
-				  expect(@data_object == nil).to eq(true)
+        it "is a Data_bcb object" do
+				  expect(@data_object.class.to_s).to eq('Data_bcb')
         end
+
+				it "is not valid" do
+					expect(@data_object.is_valid?).to eq(false)
+				end
       end
 
       context "and the requested series is valid and seazonaly adjusted" do
@@ -53,6 +57,7 @@ describe Eba do
 
         it "is valid" do
 				  expect(@data_object.is_valid?).to eq(true)
+					expect(@data_object.date.match('[0-9]+\/[0-9]+\/[0-9]+'))
         end
       end
 
@@ -71,13 +76,14 @@ describe Eba do
 
         it "is valid" do
 					expect(@data_object.is_valid?).to eq(true)
+					expect(@data_object.date.match('[0-9]+\/[0-9]+\/[0-9]+'))
 				end
       end
     end
 
     context "and requests blocks of data" do
       before :all do
-        @valid_series = 7824 
+        @valid_series = 22815
         @valid_unseasoned_series = 24364
         @invalid_series = 98526 
 				@starting_date = "01/10/2016"
@@ -104,6 +110,7 @@ describe Eba do
 				context "its result" do
 					it "has no nils" do
 						expect(@data_result.include? nil).to eq(false)
+						expect(@data_result.size > 1). to eq(true)
 					end	
 			
 					it "is valid" do
@@ -116,14 +123,21 @@ describe Eba do
 				before :all do
 					array = [@valid_unseasoned_series]
 					@data_result = @eba.get_all_data_for_array(array, @starting_date)	
-					@data_point = @data_result[0]
 				end
 		
 				it "has no nils" do
 					expect(@data_result.include? nil).to eq(false)
 				end			
+
+				it "has more than one result" do
+					expect(@data_result.size > 1).to eq(true)
+				end
 		
 				context "its data points" do
+					before :all do
+						@data_point = @data_result[Random.rand(@data_result.size)]
+					end
+
 					it "are valid" do
 						expect(@data_point.is_valid?).to eq(true)
 					end
