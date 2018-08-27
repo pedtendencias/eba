@@ -30,6 +30,10 @@ class Data_bcb
 		return @name + @periodicity.to_s + @unit
 	end
 
+	def self.invalid_data()
+		Data_bcb.new(nil, nil, nil, nil, 1, 1, 1900, 0, false)
+	end
+
 	def is_valid?
 	
 		if @name == nil or @name == '' then
