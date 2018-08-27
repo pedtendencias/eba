@@ -2,11 +2,10 @@ require "savon"
 require "net/https"
 require "nokogiri"
 require "date"
-require_relative "encoder"
-require_relative "data"
 
-class BCB < Encoder
+require_relative "helper"
 
+class BCB < Helper	
 	################################################################################################
 	# 											       																																 #
 	# You MUST supply a valid certificate in order for the connection to work!		       					 #
@@ -27,6 +26,7 @@ class BCB < Encoder
 
 	def initialize(path_to_certificate)
 		@pub_key = path_to_certificate
+
 		connect_to_service()
 	end
 
@@ -44,87 +44,44 @@ class BCB < Encoder
 		return @service.operations
 	end
 
-	# Removes all invalid series from an array.
-	#
-	# An invalid series has last value.
-	def purge_invalid_series(array_of_codes)
-		result = []
-
+	def hash_last_value_with_code(array_of_codes)
+		result = {}
+		
 		array_of_codes.each do |code|
-			if get_last_value(code) != nil
-				result << code
-			end
+			result[code] = get_last_value(code)
 		end
 
-		return result 
+		result
 	end
 
 	def hash_by_periodicity(array_of_codes)
-		purged_array_of_codes = purge_invalid_series(array_of_codes)
+		last_values = hash_last_value_with_code(array_of_codes)
+		purged_array_of_codes = purge_invalid_series(array_of_codes, last_values)
 		result = {}
 
 		purged_array_of_codes.each do |code|
-			dado = get_last_value(code)
+			dado = last_values[code]
 
-			if dado == nil then
-				puts "No valid last value for #{code}."
-			else
-				if not result.key? dado.periodicity then
-					result[dado.periodicity] = []
-				end
-
-				result[dado.periodicity] << dado
+			if not result.key? dado.periodicity then
+				result[dado.periodicity] = []
 			end
+
+			result[dado.periodicity] << dado
 		end
 
 		return result
 	end
 
-	def build_bcb_data(name, code, periodicity, unit, day, month, year, value, is_unseasoned)
-		if is_unseasoned == nil then
-			is_unseasoned = name.include? " - com ajuste sazonal"
-
-			if is_unseasoned then
-				name.slice! " - com ajuste sazonal"
-			end		
-		end
-
-		encoded_name = encode(name)
-		encoded_periodicity = encode(periodicity)
-		encoded_unit = encode(unit)
-		encoded_day = day
-		encoded_month = month
-		encoded_year = year
-		encoded_value = encode(value)
-		
-		return Data_bcb.new(encoded_name, code, encoded_periodicity,
-				    						encoded_unit, encoded_day, encoded_month,
-				    						encoded_year, encoded_value, is_unseasoned)
-	end
-
+	
 	def get_last_value(series_code)
 		begin
 			response = @service.call(:get_ultimo_valor_xml, message: {in0: "#{series_code}"})
-
 		rescue Exception => e
-			if e.message.to_s["No such operation 'getUltimoValorXML'"] != nil || 
-				 e.message.to_s["Server.userException"] != nil then
-				#This error is expetected, it only means that the code is invalid.
-
-			elsif e.message.to_s["nil:NilClass"] != nil || 
-						e.message.to_s["Connection reset by peer"] != nil || 
-						e.message.to_s["Failed to open TCP connection"] != nil || 
-						e.message.to_s["Socket closed"] != nil then
-				puts "Will have to try last value again for #{series_code}, webservice dropped the ball.\nError: #{e.message}"
-
-			else
-				puts "Error requesting last value.\nMessage: #{e.message}\nTrace: #{e.backtrace}"
-			end
-
-			return nil
+			return Data_bcb.invalid_data()
 		end
 
-		response = response.to_hash[:get_ultimo_valor_xml_response][:get_ultimo_valor_xml_return].sub("&", "-_1532_-")
+		response = response.to_hash[:get_ultimo_valor_xml_response][:get_ultimo_valor_xml_return].sub("&", 
+																																																"-_1532_-")
 
 		xmlResult = Nokogiri::XML(response)
 
@@ -139,13 +96,13 @@ class BCB < Encoder
 		# VALOR = VALUe
 
 		return build_bcb_data(xmlResult.search("NOME").text.sub("-_1532_-", "&"), 
-				      						series_code, 
-													xmlResult.search("PERIODICIDADE").text, 
-													xmlResult.search("UNIDADE").text.sub("-_1532_-", "&"), 
-													xmlResult.search("DIA").text, 
-													xmlResult.search("MES").text, 
-													xmlResult.search("ANO").text, 
-													xmlResult.search("VALOR").text, nil) 
+				      										series_code, 
+																	xmlResult.search("PERIODICIDADE").text, 
+																	xmlResult.search("UNIDADE").text.sub("-_1532_-", "&"), 
+																	xmlResult.search("DIA").text, 
+																	xmlResult.search("MES").text, 
+																	xmlResult.search("ANO").text, 
+																	xmlResult.search("VALOR").text, false) 
 	end
 
 	# Ensure that date is in the format dd/MM/YYY
@@ -177,7 +134,7 @@ class BCB < Encoder
 
 				result = send_message(message)
 	
-				if result != [] then
+				if result != nil then
 					i = 0	
 
 					result.css("SERIE").each do |serie|
@@ -191,55 +148,17 @@ class BCB < Encoder
 		return data_collection 
 	end
 
-	def extract_an_item(serie, code, base_data, data_collection)
-		# recover identifying data from the getLastValue method,
-		# as the get_valores_series_xml desn't have identifying data
-		# as series name, periodicity, etc. 
-	 
-		if serie.inspect["name=\"ID\" value=\"#{code}\""] != nil then
-			serie.css("ITEM").each do |item|
-				dia = "01"
-				mes = "1"
-				ano = "1"
-				data = item.css("DATA").text.split("/")
-
-				if base_data.periodicity == 'D' then
-					dia = data[0]
-					mes = data[1]
-					ano = data[2]
-				else
-					mes = data[0]
-					ano = data[1]
-				end 
-
-				data_collection << build_bcb_data(base_data.name, code, 
-																					base_data.periodicity, 
-																					base_data.unit, 
-																					dia, mes, ano, 
-																					item.css("VALOR").text,
-																					base_data.seasonally_adjusted)
-			end
-		end
-	end
-
 	def send_message(message)
+		result = nil
+
 		# try and catch, as some series can be discontinued or a code may be broken
 		begin
 			response = @service.call(:get_valores_series_xml, message: message)	
 			result = Nokogiri::XML(response.to_hash[:get_valores_series_xml_response][:get_valores_series_xml_return])
 		rescue Exception => erro
-			#The interval is empty, therefore an empty array should be returned.
-			if erro.to_s.include? "Value(s) not found" then
-				puts "Some of the codes might be invalid. Requested: #{message[:in0][:long]}."
-				return []
-
-			elsif erro.message.to_s["Socket closed"] != nil then
-				puts "\n\nSocket closed for message #{message[:in0][:long]}, try again."
-
-			else
-				puts "\n\nError requesting all data for the range [#{min_date}, #{max_date}] for codes #{message[:in0][:long]}! #{erro}\nTrace: #{erro.backtrace}\nMessage: #{erro.message}\n"				
-				return []
-			end
+			result = nil
 		end
+		
+		result
 	end
 end
