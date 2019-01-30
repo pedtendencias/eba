@@ -10,31 +10,27 @@ class BCB < Helper
 	# 											       																																 #
 	# You MUST supply a valid certificate in order for the connection to work!		       					 #
 	# The certificate you are looking for is located in this webpage:			       									 #
-	# 	http://www.bcb.gov.br/?CERTDIG							       																				 #
+	# 	https://www.bcb.gov.br/estabilidadefinanceira/certificacaodigital 												 #
 	#											       																																	 #
-	# It will the most recent one which looks something like:				       												 #
-	#	Cadeia de CAs de *.bcb.gov.br (yyyy)						       																			 #
-	#											       																																	 #
-	# You then have to generate a public key from this crt file,				       										 #
-	# you can do so by following this StackOverflow post:					       													 #
-	#	http://stackoverflow.com/questions/5244129/use-rsa-private-key-to-generate-public-key  			 #
+	# You MUST supply both the file 'bcb.gov.br (... - year)' file as the certificate AND the      #
+	# 'Cadeia de CAs de *.bcb.gov.br (validação estendida - 2018)' file as the CA.                 #
 	#											       																																	 #
 	# With all this done, you will be able to access freely this 				       										 #
 	# service, without much hassle.	Don't forget to upvote such an useful answer.                  #
 	#											       																																	 #
 	################################################################################################
 
-	def initialize(path_to_certificate)
-		@pub_key = path_to_certificate
+	def initialize(path_to_certificate, path_to_ca_certificate)
+		@cert = path_to_certificate
+		@ca = path_to_ca_certificate
 
 		connect_to_service()
 	end
 
 	def connect_to_service()
-
-
-		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/sgspub/JSP/sgsgeral/FachadaWSSGS.wsdl",
-														 ssl_cert_file: @pub_key,
+		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/wssgs/services/FachadaWSSGS?wsdl",
+														 ssl_cert_file: @cert,
+														 ssl_ca_cert_file: @ca,
 														 headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
 
