@@ -8,7 +8,8 @@ describe Eba do
 
   context "when you receive a certificate" do
     before :all do
-      @eba = BCB.new('/valid_certificate/pubkey.pem')
+      @eba = BCB.new('./spec/valid_certificate/cert.crt', 
+										 './spec/valid_certificate/ca.crt')
     end
 
     it "it has a list of operations" do
