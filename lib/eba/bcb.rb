@@ -12,24 +12,20 @@ class BCB < Helper
 	# The certificate you are looking for is located in this webpage:			       									 #
 	# 	https://www.bcb.gov.br/estabilidadefinanceira/certificacaodigital 												 #
 	#											       																																	 #
-	# You MUST supply both the file 'bcb.gov.br (... - year)' file as the certificate AND the      #
-	# 'Cadeia de CAs de *.bcb.gov.br (validação estendida - 2018)' file as the CA.                 #
+	# You MUST supply 'Cadeia de CAs de *.bcb.gov.br (validação estendida - 2018)' file as the CA. #
 	#											       																																	 #
 	# With all this done, you will be able to access freely this 				       										 #
 	# service, without much hassle.	Don't forget to upvote such an useful answer.                  #
 	#											       																																	 #
 	################################################################################################
 
-	def initialize(path_to_certificate, path_to_ca_certificate)
-		@cert = path_to_certificate
+	def initialize(path_to_ca_certificate)
 		@ca = path_to_ca_certificate
-
 		connect_to_service()
 	end
 
 	def connect_to_service()
 		@service = Savon.client({wsdl: "https://www3.bcb.gov.br/wssgs/services/FachadaWSSGS?wsdl",
-														 ssl_cert_file: @cert,
 														 ssl_ca_cert_file: @ca,
 														 headers: {'Accept-Encoding' => 'gzip, deflate'}})
 	end
