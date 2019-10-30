@@ -35,44 +35,43 @@ class Data_bcb
 	end
 
 	def is_valid?
-	
 		if @name == nil or @name == '' then
-			puts "Found invalid name! Value is '#{@name}'"
+			puts "BCB ERROR: Found invalid name! Value is '#{@name}' for #{@pk}."
 			return false
 		end
 
 		if @periodicity == nil or @periodicity == '' or @periodicity.length > 1 then
-			puts "Found invalid periodicity! Value is '#{@periodicity}'"
+			puts "BCB ERROR: Found invalid periodicity! Value is '#{@periodicity}' for #{@pk}."
 			return false
 		end
 		
 		if @unit == nil or @unit == '' then
-			puts "Found invalid unit! Value is '#{@unit}'"
+			puts "BCB ERROR: Found invalid unit! Value is '#{@unit}' for #{@pk}."
 			return false
 		end
 
 		if @date == nil or @date == '' then
-			puts "Found invalid date! Value is '#{@date}'"
+			puts "BCB ERROR: Found invalid date! Value is '#{@date}' for #{@pk}."
 			return false
 		else
 			if !(DateTime.parse(@date).to_date != nil rescue false) then
-				puts "Found invalid date! Value is '#{@date}'"
+				puts "BCB ERROR: Found invalid date! Value is '#{@date}' for #{@pk}."
 				return false
 			end
 		end
 
 		if @value == nil then
-			puts "Found invalid value! Value is '#{@value}'"
+			puts "BCB ERROR: Found invalid value! Value is '#{@value}' for #{@pk}."
 			return false
 		else
 			if !(@value.to_f != nil rescue false) then
-				puts "Found invalid value! Value is '#{@value}'"	
+				puts "BCB ERROR: Found invalid value! Value is '#{@value}' for #{@pk}."	
 				return false
 			end
 		end
 
 		if @pk == nil or  @pk <= 0 then
-			puts "Found invalid pk! Value is '#{@pk}'"
+			puts "BCB ERROR: Found invalid pk! Value is '#{@pk}'"
 			return false
 		end
 
