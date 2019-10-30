@@ -21,6 +21,7 @@ class BCB < Helper
 
 	def initialize(path_to_ca_certificate)
 		@ca = path_to_ca_certificate
+		@attempts = 0
 		connect_to_service()
 	end
 
@@ -88,56 +89,69 @@ class BCB < Helper
 		# VALOR = VALUe
 
 		return build_bcb_data(xmlResult.search("NOME").text.sub("-_1532_-", "&"), 
-				      										series_code, 
-																	xmlResult.search("PERIODICIDADE").text, 
-																	xmlResult.search("UNIDADE").text.sub("-_1532_-", "&"), 
-																	xmlResult.search("DIA").text, 
-																	xmlResult.search("MES").text, 
-																	xmlResult.search("ANO").text, 
-																	xmlResult.search("VALOR").text, false) 
+				      						series_code, 
+													xmlResult.search("PERIODICIDADE").text, 
+													xmlResult.search("UNIDADE").text.sub("-_1532_-", "&"), 
+													xmlResult.search("DIA").text, 
+													xmlResult.search("MES").text, 
+													xmlResult.search("ANO").text, 
+													xmlResult.search("VALOR").text, false) 
 	end
 
 	# Ensure that date is in the format dd/MM/YYY
-	def get_all_data_for_array(array_of_codes, min_date, max_date = Time.now.strftime('%d/%m/%Y').to_s)
+	def get_all_data_for_array(array_of_codes, min_date, max_date = Time.now.strftime('%d/%m/%Y').to_s, slice_size=50)
 		result = nil
-		data_collection = Array.new()		
+		data_collection = []
 
 		# This request has a limit of series he can get at a time, thus
 		# it's way simpler to break a composite requests in various smaller
 		# requests. The Data_bcb class serves as a way to organize such data
 		# and allow the developer to easily identify which series each data
 		# object pertains.		
+
+		if slice_size > 50 then
+			slice_size = 50
+		end
+
 		array_of_codes.each_slice(50).to_a.each do |array|
 			hash = hash_by_periodicity(array)
 
 			hash.each do |periodicity, array|
-				codes = []
-				data_array = []
+				code_x_data = {}
 
 				array.each do |data|
-					data_array <<  data	
-					codes << data.pk
+					code_x_data[data.pk] = data
 				end
 
 				# Build the  message from the start of the historical series
-				message = { in0: {long: codes}, 
-					    			in1: min_date, 
-					    			in2: max_date}
+				message = {in0: {long: code_x_data.keys}, 
+					    		 in1: min_date, 
+					    		 in2: max_date}
 
 				result = send_message(message)
-	
+
 				if result != nil then
 					i = 0	
 
 					result.css("SERIE").each do |serie|
-						extract_an_item(serie, codes[i], data_array[i], data_collection)
+						extract_an_item(serie, code_x_data, data_collection)
 						i = i + 1
 					end
 				end
 			end
 		end
 
-		return data_collection 
+		if data_collection.size == 0 && array_of_codes.size > 0 && @attempts < 5 then
+			@attempts = @attempts + 1
+
+			puts "BCB WARNING: No data returned for #{array_of_codes}. Trying again #{@attempts}/5"
+			sleep(1 * @attempts)
+
+			data_collection = get_all_data_for_array(array_of_codes, min_date, max_date)
+			@attemps = 0
+		end
+
+		data_collection
 	end
 
 	def send_message(message)
