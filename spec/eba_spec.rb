@@ -19,7 +19,8 @@ describe Eba do
     context "and requests the last value for an series" do
       # As of 2016-11-22 98526 was an invalid series.
       before :all do
-				@valid_series = 22815 
+				@valid_series = 24363
+				@series_with_issue = 14087
 				@seasonally_adjusted = 24364 	
         @invalid_series = 98526 
       end
@@ -63,27 +64,32 @@ describe Eba do
 
       context "and the requested series is a valid one" do 
 				before :all do
-				  @data_object = @eba.get_last_value(@valid_series)
+				  @do = @eba.get_last_value(@valid_series)
+				  @do_issue = @eba.get_last_value(@series_with_issue)
 				end
 	
 				it "is identified as non seazonally adjusted" do
-				  expect(@data_object.seasonally_adjusted).to eq(false)
+				  expect(@do.seasonally_adjusted).to eq(false)
 				end
 
 				it "is not nil" do
-          expect(@data_object != nil).to eq(true)
+          expect(@do != nil).to eq(true)
         end
 
         it "is valid" do
-					expect(@data_object.is_valid?).to eq(true)
-					expect(@data_object.date.match('[0-9]+\/[0-9]+\/[0-9]+'))
+					expect(@do.is_valid?).to eq(true)
+					expect(@do.date.match('[0-9]+\/[0-9]+\/[0-9]+'))
+
+					expect(@do_issue.is_valid?).to eq(true)
+					expect(@do_issue.date.match('[0-9]+\/[0-9]+\/[0-9]+'))
 				end
       end
     end
 
     context "and requests blocks of data" do
       before :all do
-        @valid_series = 22815
+        @valid_series = 24363
+				@series_with_issue = 14087
         @valid_unseasoned_series = 24364
         @invalid_series = 98526 
 				@starting_date = "01/10/2016"
@@ -99,12 +105,13 @@ describe Eba do
 				end
 			end
 
-      context "using two valid series" do
+      context "using three valid series" do
         before :all do
-				  array = [@valid_series, @valid_unseasoned_series] 
+				  array = [@valid_series, @valid_unseasoned_series, @series_with_issue] 
 
           @data_result = @eba.get_all_data_for_array(array, @starting_date, @ending_date)
 					@data_object = @data_result[0]
+					@do_issue = @data_result[2]
         end
 
 				context "its result" do
@@ -115,6 +122,7 @@ describe Eba do
 			
 					it "is valid" do
 						expect(@data_object.is_valid?).to eq(true)
+						expect(@do_issue.is_valid?).to eq(true)
 					end
 				end
       end
@@ -129,7 +137,7 @@ describe Eba do
 					expect(@data_result.include? nil).to eq(false)
 				end			
 
-				it "has more than one result" do
+				it "has one result" do
 					expect(@data_result.size > 1).to eq(true)
 				end
 		

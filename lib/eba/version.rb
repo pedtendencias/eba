@@ -5,7 +5,7 @@ module Eba
   # ff - commits on feature
   # hh - commits on hotfix
 
-  VERSION = "2.0.1"
+  VERSION = "2.0.2"
 
   #Version 1.0.1
   #
@@ -89,4 +89,7 @@ module Eba
 
 	#Version 2.0.1
 	# Removes useless certificate and supplies only CA. 
+
+	#Version 2.0.2
+	# Improves reliability for getting data and identifying it.
 end
