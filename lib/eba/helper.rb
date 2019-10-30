@@ -42,33 +42,39 @@ class Helper < Encoder
 		return result 
 	end
 
-	def extract_an_item(serie, code, base_data, data_collection)
+	def extract_an_item(serie, code_x_data_hash, collection)
 		# recover identifying data from the getLastValue method,
 		# as the get_valores_series_xml desn't have identifying data
-		# as series name, periodicity, etc. 
-	 
-		if serie.inspect["name=\"ID\" value=\"#{code}\""] != nil then
-			serie.css("ITEM").each do |item|
-				dia = "01"
-				mes = "1"
-				ano = "1"
-				data = item.css("DATA").text.split("/")
+		# as series name, periodicity, etc. 	 
+		if serie.to_s.inspect["SERIE ID"] != nil then
+			code = serie.to_s.match(/SERIE ID=\"([0-9]+)\"/)[1].to_i
+			base_data = code_x_data_hash[code]
 
-				if base_data.periodicity == 'D' then
-					dia = data[0]
-					mes = data[1]
-					ano = data[2]
-				else
-					mes = data[0]
-					ano = data[1]
-				end 
+			if base_data != nil then
+				serie.css("ITEM").each do |item|
+					dia = "01"
+					mes = "1"
+					ano = "1"
+					data = item.css("DATA").text.split("/")
 
-				data_collection << build_bcb_data(base_data.name, code, 
-																									base_data.periodicity, 
-																									base_data.unit, 
-																									dia, mes, ano, 
-																									item.css("VALOR").text,
-																									base_data.seasonally_adjusted)
+					if base_data.periodicity == 'D' then
+						dia = data[0]
+						mes = data[1]
+						ano = data[2]
+					else
+						mes = data[0]
+						ano = data[1]
+					end 
+
+					collection <<  build_bcb_data(base_data.name, code, 
+																   		  base_data.periodicity, 
+															 					base_data.unit, 
+															 					dia, mes, ano, 
+															 					item.css("VALOR").text,
+															 					base_data.seasonally_adjusted)
+				end	
+			else
+				puts "ERROR BCB: Failure do locate #{code} in the data collection #{code_x_data_hash.keys}"
 			end
 		end
 	end
